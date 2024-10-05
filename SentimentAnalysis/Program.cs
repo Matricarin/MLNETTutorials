@@ -6,10 +6,19 @@ namespace SentimentAnalysis
 {
     internal class Program
     {
-        string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "yelp_labelled.txt");
+        private static string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "yelp_labelled.txt");
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Console.WriteLine("Hello, ML!");
+            MLContext mlContext = new MLContext();
+            TrainTestData splitDataView = LoadData(mlContext);
+        }
+
+        static TrainTestData LoadData(MLContext mlContext)
+        {
+            IDataView dataView = mlContext.Data.LoadFromTextFile<SentimentData>(_dataPath, hasHeader: false);
+            TrainTestData splitDataView = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
+            return splitDataView;
         }
     }
 }
