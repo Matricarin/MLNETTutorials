@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML;
+using Microsoft.ML.Data;
 using static Microsoft.ML.DataOperationsCatalog;
 
 namespace SentimentAnalysis;
@@ -13,6 +14,16 @@ internal class Program
         var mlContext = new MLContext();
         TrainTestData splitDataView = LoadData(mlContext);
         ITransformer model = BuildAndTrainModel(mlContext, splitDataView.TrainSet);
+        Evaluate(mlContext, model, splitDataView.TestSet);
+        UseModelWithSingleItem(mlContext, model);
+        var isContinuedPrediction = true;
+        while (isContinuedPrediction)
+        {
+            UseModelWithBatchItems(mlContext, model);
+            Console.WriteLine("Will you continue to use application? Y/N");
+            string answer = Console.ReadLine();
+            isContinuedPrediction = answer == "Y" ? true : false;
+        }
     }
 
     private static TrainTestData LoadData(MLContext mlContext)
@@ -64,5 +75,23 @@ internal class Program
 
         Console.WriteLine("=============== End of Predictions ===============");
         Console.WriteLine();
+    }
+
+    static void UseModelWithBatchItems(MLContext mlContext, ITransformer model)
+    {
+        Console.WriteLine("Please enter your sentiments");
+        var sentiments = Console.ReadLine();
+        var sentimentsList = sentiments?.Split('.').ToList();
+        var sentimentsDataList = sentimentsList.Select(s => new SentimentData() { SentimentText = s }).ToList();
+        IDataView batchComments = mlContext.Data.LoadFromEnumerable(sentimentsDataList);
+        IDataView predictions = model.Transform(batchComments);
+        IEnumerable<SentimentPrediction> predictedResults = mlContext.Data.CreateEnumerable<SentimentPrediction>(predictions, reuseRowObject: false);
+        Console.WriteLine();
+        Console.WriteLine("=============== Prediction Test of loaded model with multiple samples ===============");
+        foreach (SentimentPrediction prediction in predictedResults)
+        {
+            Console.WriteLine($"Sentiment: {prediction.SentimentText} | Prediction: {(Convert.ToBoolean(prediction.Prediction) ? "Positive" : "Negative")} | Probability: {prediction.Probability} ");
+        }
+        Console.WriteLine("=============== End of predictions ===============");
     }
 }

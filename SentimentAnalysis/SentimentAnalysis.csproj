@@ -11,4 +11,10 @@
     <PackageReference Include="Microsoft.ML" Version="3.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\yelp_labelled.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
