@@ -1,40 +1,39 @@
 ﻿using Microsoft.ML;
-using Microsoft.ML.Data;
 using static Microsoft.ML.DataOperationsCatalog;
 
-namespace SentimentAnalysis
+namespace SentimentAnalysis;
+
+internal class Program
 {
-    internal class Program
+    private static readonly string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "yelp_labelled.txt");
+
+    private static void Main(string[] args)
     {
-        private static string _dataPath = Path.Combine(Environment.CurrentDirectory, "Data", "yelp_labelled.txt");
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, ML!");
-            MLContext mlContext = new MLContext();
-            TrainTestData splitDataView = LoadData(mlContext);
-            ITransformer model = BuildAndTrainModel(mlContext, splitDataView.TrainSet);
-        }
+        Console.WriteLine("Hello, ML!");
+        var mlContext = new MLContext();
+        TrainTestData splitDataView = LoadData(mlContext);
+        ITransformer model = BuildAndTrainModel(mlContext, splitDataView.TrainSet);
+    }
 
-        static TrainTestData LoadData(MLContext mlContext)
-        {
-            IDataView dataView = mlContext.Data.LoadFromTextFile<SentimentData>(_dataPath, hasHeader: false);
-            TrainTestData splitDataView = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
-            return splitDataView;
-        }
+    private static TrainTestData LoadData(MLContext mlContext)
+    {
+        var dataView = mlContext.Data.LoadFromTextFile<SentimentData>(_dataPath, hasHeader: false);
+        var splitDataView = mlContext.Data.TrainTestSplit(dataView, 0.2);
+        return splitDataView;
+    }
 
-        private static ITransformer BuildAndTrainModel(MLContext mlContext, IDataView splitTrainSet)
-        {
-            var estimator = mlContext.Transforms.Text.FeaturizeText(outputColumnName: "Features", inputColumnName: nameof(SentimentData.SentimentText))
-                .Append(mlContext.BinaryClassification.Trainers.SdcaLogisticRegression(labelColumnName: "Label", featureColumnName: "Features"));
-            Console.WriteLine("=============== Create and Train the Model ===============");
-            var model = estimator.Fit(splitTrainSet);
-            Console.WriteLine("=============== End of training ===============");
-            Console.WriteLine();
-            return model;
-        }
-        void Evaluate(MLContext mlContext, ITransformer model, IDataView splitTestSet)
-        {
+    private static ITransformer BuildAndTrainModel(MLContext mlContext, IDataView splitTrainSet)
+    {
+        var estimator = mlContext.Transforms.Text.FeaturizeText("Features", nameof(SentimentData.SentimentText))
+            .Append(mlContext.BinaryClassification.Trainers.SdcaLogisticRegression("Label", "Features"));
+        Console.WriteLine("=============== Create and Train the Model ===============");
+        ITransformer model = estimator.Fit(splitTrainSet);
+        Console.WriteLine("=============== End of training ===============");
+        Console.WriteLine();
+        return model;
+    }
 
-        }
+    private void Evaluate(MLContext mlContext, ITransformer model, IDataView splitTestSet)
+    {
     }
 }
