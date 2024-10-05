@@ -49,5 +49,20 @@ internal class Program
 
     static void UseModelWithSingleItem(MLContext mlContext, ITransformer model)
     {
+        PredictionEngine<SentimentData, SentimentPrediction> predictionFunction =
+            mlContext.Model.CreatePredictionEngine<SentimentData, SentimentPrediction>(model);
+        SentimentData sampleStatement = new SentimentData()
+        {
+            SentimentText = "This was a very bad steak"
+        };
+        var resultPrediction = predictionFunction.Predict(sampleStatement);
+        Console.WriteLine();
+        Console.WriteLine("=============== Prediction Test of model with a single sample and test dataset ===============");
+
+        Console.WriteLine();
+        Console.WriteLine($"Sentiment: {resultPrediction.SentimentText} | Prediction: {(Convert.ToBoolean(resultPrediction.Prediction) ? "Positive" : "Negative")} | Probability: {resultPrediction.Probability} ");
+
+        Console.WriteLine("=============== End of Predictions ===============");
+        Console.WriteLine();
     }
 }
