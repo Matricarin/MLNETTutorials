@@ -90,6 +90,18 @@ namespace GitHubIssueClassification
         static void PredictIssue()
         {
             ITransformer loadedModel = _mlContext.Model.Load(_modelPath, out var modelInputSchema);
+            Console.WriteLine("Please, enter Issue title:");
+            var title = Console.ReadLine();
+            Console.WriteLine("Please, enter Issue description:");
+            var description = Console.ReadLine();
+            GitHubIssue issue = new GitHubIssue()
+            {
+                Title = title,
+                Description = description
+            };
+            _predEngine = _mlContext.Model.CreatePredictionEngine<GitHubIssue, IssuePrediction>(loadedModel);
+            var prediction = _predEngine.Predict(issue);
+            Console.WriteLine($"=============== Single Prediction - Result: {prediction.Area} ===============");
         }
     }
 }
