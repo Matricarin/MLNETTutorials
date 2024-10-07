@@ -23,6 +23,7 @@ namespace GitHubIssueClassification
             var pipeline = ProcessData();
             var trainingPipeline = BuildAndTrainModel(_trainingDataView, pipeline);
             Evaluate(_trainingDataView.Schema);
+
         }
 
         static IEstimator<ITransformer> ProcessData()
@@ -67,6 +68,13 @@ namespace GitHubIssueClassification
             Console.WriteLine($"*       LogLoss:          {testMetrics.LogLoss:#.###}");
             Console.WriteLine($"*       LogLossReduction: {testMetrics.LogLossReduction:#.###}");
             Console.WriteLine($"*************************************************************************************************************");
+            SaveModelAsFile(_mlContext, trainingDataViewSchema, _trainedModel);
         }
+
+        static void SaveModelAsFile(MLContext mlContext, DataViewSchema trainingDataViewSchema, ITransformer model)
+        {
+            mlContext.Model.Save(model, trainingDataViewSchema, _modelPath);
+        }
+
     }
 }
