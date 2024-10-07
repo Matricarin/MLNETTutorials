@@ -26,7 +26,15 @@ namespace GitHubIssueClassification
 
         static IEstimator<ITransformer> ProcessData()
         {
-
+            var pipeline =
+                _mlContext.Transforms.Conversion.MapValueToKey(inputColumnName: "Area", outputColumnName: "Label")
+                    .Append(_mlContext.Transforms.Text.FeaturizeText(inputColumnName: "Title",
+                        outputColumnName: "TitleFeaturized"))
+                    .Append(_mlContext.Transforms.Text.FeaturizeText(inputColumnName: "Description",
+                        outputColumnName: "DescriptionFeaturized"))
+                    .Append(_mlContext.Transforms.Concatenate("Features", "TitleFeaturized", "DescriptionFeaturized"))
+                    .AppendCacheCheckpoint(_mlContext);
+            return pipeline;
         }
     }
 }
