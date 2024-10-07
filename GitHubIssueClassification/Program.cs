@@ -21,7 +21,7 @@ namespace GitHubIssueClassification
             _mlContext = new MLContext(seed: 0);
             _mlContext.Data.LoadFromTextFile<GitHubIssue>(_trainDataPath, hasHeader: true);
             var pipeline = ProcessData();
-
+            var trainingPipeline = BuildAndTrainModel(_trainingDataView, pipeline);
         }
 
         static IEstimator<ITransformer> ProcessData()
@@ -35,6 +35,11 @@ namespace GitHubIssueClassification
                     .Append(_mlContext.Transforms.Concatenate("Features", "TitleFeaturized", "DescriptionFeaturized"))
                     .AppendCacheCheckpoint(_mlContext);
             return pipeline;
+        }
+
+        IEstimator<ITransformer> BuildAndTrainModel(IDataView trainingDataView, IEstimator<ITransformer> pipeline)
+        {
+
         }
     }
 }
