@@ -1,5 +1,6 @@
 ﻿using Microsoft.ML;
 using Microsoft.ML.Data;
+using MLTutorialsModels;
 using static Microsoft.ML.DataOperationsCatalog;
 
 namespace SentimentAnalysis;

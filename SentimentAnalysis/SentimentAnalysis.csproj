@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MLTutorialsModels\MLTutorialsModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Data\yelp_labelled.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
