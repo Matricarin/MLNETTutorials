@@ -1,6 +1,5 @@
 ﻿using Microsoft.ML;
 using MLTutorialsModels;
-using System.Reflection;
 
 namespace GitHubIssueClassification
 {
