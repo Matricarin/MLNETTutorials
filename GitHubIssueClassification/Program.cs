@@ -53,5 +53,10 @@ namespace GitHubIssueClassification
             Console.WriteLine($"=============== Single Prediction just-trained-model - Result: {prediction.Area} ===============");
             return trainingPipeline;
         }
+
+        void Evaluate(DataViewSchema trainingDataViewSchema)
+        {
+
+        }
     }
 }
