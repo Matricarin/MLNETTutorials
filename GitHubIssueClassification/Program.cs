@@ -1,5 +1,6 @@
 ﻿using Microsoft.ML;
 using MLTutorialsModels;
+using System.Reflection;
 
 namespace GitHubIssueClassification
 {
@@ -23,6 +24,16 @@ namespace GitHubIssueClassification
             var pipeline = ProcessData();
             var trainingPipeline = BuildAndTrainModel(_trainingDataView, pipeline);
             Evaluate(_trainingDataView.Schema);
+
+            bool isContinuedPrediction = true;
+
+            while (isContinuedPrediction)
+            {
+                PredictIssue();
+                Console.WriteLine("Will you continue to use application? Y/N");
+                string answer = Console.ReadLine();
+                isContinuedPrediction = answer == "Y" ? true : false;
+            }
 
         }
 
@@ -76,5 +87,9 @@ namespace GitHubIssueClassification
             mlContext.Model.Save(model, trainingDataViewSchema, _modelPath);
         }
 
+        static void PredictIssue()
+        {
+            ITransformer loadedModel = _mlContext.Model.Load(_modelPath, out var modelInputSchema);
+        }
     }
 }
