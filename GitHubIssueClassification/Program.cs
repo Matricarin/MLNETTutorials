@@ -22,6 +22,7 @@ namespace GitHubIssueClassification
             _trainingDataView = _mlContext.Data.LoadFromTextFile<GitHubIssue>(_trainDataPath, hasHeader: true);
             var pipeline = ProcessData();
             var trainingPipeline = BuildAndTrainModel(_trainingDataView, pipeline);
+            Evaluate(_trainingDataView.Schema);
         }
 
         static IEstimator<ITransformer> ProcessData()
@@ -54,9 +55,18 @@ namespace GitHubIssueClassification
             return trainingPipeline;
         }
 
-        void Evaluate(DataViewSchema trainingDataViewSchema)
+        static void Evaluate(DataViewSchema trainingDataViewSchema)
         {
-
+            var testDataView = _mlContext.Data.LoadFromTextFile<GitHubIssue>(_testDataPath, hasHeader: true);
+            var testMetrics = _mlContext.MulticlassClassification.Evaluate(_trainedModel.Transform(testDataView));
+            Console.WriteLine($"*************************************************************************************************************");
+            Console.WriteLine($"*       Metrics for Multi-class Classification model - Test Data     ");
+            Console.WriteLine($"*------------------------------------------------------------------------------------------------------------");
+            Console.WriteLine($"*       MicroAccuracy:    {testMetrics.MicroAccuracy:0.###}");
+            Console.WriteLine($"*       MacroAccuracy:    {testMetrics.MacroAccuracy:0.###}");
+            Console.WriteLine($"*       LogLoss:          {testMetrics.LogLoss:#.###}");
+            Console.WriteLine($"*       LogLossReduction: {testMetrics.LogLossReduction:#.###}");
+            Console.WriteLine($"*************************************************************************************************************");
         }
     }
 }
